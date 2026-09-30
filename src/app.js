@@ -33,14 +33,30 @@ app.use(
 app.use(customSecurityHeaders);
 
 // 4. CORS configuration
-const allowedOrigins = process.env.CLIENT_URL
-  ? process.env.CLIENT_URL.split(',').map((u) => u.trim())
-  : ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:80', 'http://localhost:8081'];
+const defaultOrigins = [
+  'http://localhost:5173',
+  'http://localhost:5174',
+  'http://localhost:80',
+  'http://localhost:8081',
+  'https://fmp-user.vercel.app',
+  'https://fmp-admin-two.vercel.app'
+];
+
+const envOrigins = process.env.CLIENT_URL
+  ? process.env.CLIENT_URL.split(',').map((u) => u.trim().replace(/\/$/, ''))
+  : [];
+
+const allowedOrigins = Array.from(new Set([...defaultOrigins, ...envOrigins]));
 
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin) || config.env !== 'production') {
+      if (!origin) return callback(null, true);
+      const normalizedOrigin = origin.replace(/\/$/, '');
+      if (
+        allowedOrigins.some((o) => o.replace(/\/$/, '') === normalizedOrigin) ||
+        config.env !== 'production'
+      ) {
         callback(null, true);
       } else {
         callback(null, true);
@@ -48,7 +64,7 @@ app.use(
     },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization']
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept']
   })
 );
 

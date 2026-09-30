@@ -12,5 +12,6 @@ export const config = {
   clientUrl: process.env.CLIENT_URL || 'http://localhost:5173',
   defaultTimezone: process.env.DEFAULT_TIMEZONE || 'Asia/Kolkata',
   maxAllowedAccuracy: parseFloat(process.env.MAX_ALLOWED_ACCURACY || '200000'),
-  gamesModuleEnabled: process.env.GAMES_MODULE_ENABLED !== 'false'
+  gamesModuleEnabled: process.env.GAMES_MODULE_ENABLED !== 'false',
+  autoSeed: process.env.AUTO_SEED === 'true'
 };
