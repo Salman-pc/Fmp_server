@@ -12,17 +12,8 @@ export const globalApiLimiter = rateLimit({
   legacyHeaders: false
 });
 
-export const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 20, // Limit each IP to 20 auth requests per windowMs
-  message: {
-    success: false,
-    message: 'Too many authentication attempts from this IP, please try again after 15 minutes',
-    code: 'RATE_LIMIT_EXCEEDED'
-  },
-  standardHeaders: true,
-  legacyHeaders: false
-});
+// Disabled rate limiting for auth per user request
+export const authLimiter = (req, res, next) => next();
 
 export const checkInLimiter = rateLimit({
   windowMs: 1 * 60 * 1000, // 1 minute

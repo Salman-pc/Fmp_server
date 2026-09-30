@@ -5,10 +5,14 @@ import { config } from './config/env.js';
 import { connectDB } from './config/db.js';
 import { logger } from './utils/logger.js';
 import { setupGameSockets } from './sockets/game.socket.js';
+import { autoSeedData } from './utils/seedData.js';
 
 const startServer = async () => {
   // Connect to MongoDB
   await connectDB();
+
+  // Auto-seed default accounts & active meeting
+  await autoSeedData();
 
   // Create HTTP server
   const server = http.createServer(app);
