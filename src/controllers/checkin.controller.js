@@ -1,4 +1,5 @@
 import * as checkInService from '../services/checkin.service.js';
+import * as meetingService from '../services/meeting.service.js';
 
 export const submitCheckIn = async (req, res, next) => {
   try {
@@ -66,6 +67,29 @@ export const resetCheckIn = async (req, res, next) => {
     res.status(200).json({
       success: true,
       message: result.message
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getPresentUsers = async (req, res, next) => {
+  try {
+    let meetingId = req.params.meetingId;
+    if (!meetingId || meetingId === 'current') {
+      const activeMeeting = await meetingService.getCurrentActiveMeeting();
+      if (!activeMeeting) {
+        return res.status(200).json({
+          success: true,
+          data: { presentCount: 0, presentUsers: [] }
+        });
+      }
+      meetingId = activeMeeting._id;
+    }
+    const result = await meetingService.getPresentUsersForMeeting(meetingId);
+    res.status(200).json({
+      success: true,
+      data: result
     });
   } catch (error) {
     next(error);

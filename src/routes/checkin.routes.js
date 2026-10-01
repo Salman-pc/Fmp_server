@@ -12,6 +12,8 @@ router.use(protect);
 router.post('/', checkInLimiter, validate(submitCheckInSchema), checkInController.submitCheckIn);
 router.get('/me', checkInController.getMyCheckIns);
 router.get('/status/:meetingId', checkInController.getCheckInStatus);
+router.get('/present-users', checkInController.getPresentUsers);
+router.get('/present-users/:meetingId', checkInController.getPresentUsers);
 router.delete('/reset/:meetingId', checkInController.resetCheckIn);
 
 export default router;
