@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken';
 import { User } from '../models/User.js';
 import { config } from '../config/env.js';
+import { sendOtpEmail } from './email.service.js';
 
 export const generateAccessToken = (userId) => {
   return jwt.sign({ id: userId }, config.jwtSecret, {
@@ -162,8 +163,11 @@ export const forgotPassword = async (email) => {
   user.resetPasswordExpires = new Date(Date.now() + 15 * 60 * 1000); // 15 mins
   await user.save({ validateBeforeSave: false });
 
+  // Dispatch OTP email via Nodemailer
+  await sendOtpEmail(user.email, resetCode);
+
   return {
-    message: 'Password reset code generated.',
+    message: 'Password reset OTP code sent to your email.',
     email: user.email,
     resetCode
   };

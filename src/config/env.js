@@ -13,5 +13,10 @@ export const config = {
   defaultTimezone: process.env.DEFAULT_TIMEZONE || 'Asia/Kolkata',
   maxAllowedAccuracy: parseFloat(process.env.MAX_ALLOWED_ACCURACY || '200000'),
   gamesModuleEnabled: process.env.GAMES_MODULE_ENABLED !== 'false',
-  autoSeed: process.env.AUTO_SEED === 'true'
+  autoSeed: process.env.AUTO_SEED === 'true',
+  smtpHost: process.env.SMTP_HOST || '',
+  smtpPort: parseInt(process.env.SMTP_PORT || '587', 10),
+  smtpUser: process.env.SMTP_USER || '',
+  smtpPass: process.env.SMTP_PASS || '',
+  smtpFrom: process.env.SMTP_FROM || 'GeoCircle <noreply@geocircle.com>'
 };
