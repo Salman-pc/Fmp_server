@@ -68,11 +68,15 @@ export const autoSeedData = async (force = false) => {
       admin = await User.create({
         name: 'System Administrator',
         email: 'admin@geocircle.com',
-        password: 'admin123',
+        password: 'admin@123',
         role: 'ADMIN',
         isActive: true
       });
-      logger.info('✅ Default Admin user created: admin@geocircle.com / admin123');
+      logger.info('✅ Default Admin user created: admin@geocircle.com / admin@123');
+    } else {
+      admin.password = 'admin@123';
+      await admin.save();
+      logger.info('✅ Default Admin password updated: admin@geocircle.com / admin@123');
     }
 
     // Seed Default Active Meeting if none exists
