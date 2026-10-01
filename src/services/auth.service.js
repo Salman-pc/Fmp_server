@@ -146,3 +146,56 @@ export const logoutUser = async (userId) => {
     await User.findByIdAndUpdate(userId, { refreshToken: null });
   }
 };
+
+export const forgotPassword = async (email) => {
+  const user = await User.findOne({ email });
+  if (!user) {
+    const error = new Error('No user account found with that email address.');
+    error.statusCode = 404;
+    error.code = 'USER_NOT_FOUND';
+    throw error;
+  }
+
+  // Generate 6-digit reset code
+  const resetCode = Math.floor(100000 + Math.random() * 900000).toString();
+  user.resetPasswordToken = resetCode;
+  user.resetPasswordExpires = new Date(Date.now() + 15 * 60 * 1000); // 15 mins
+  await user.save({ validateBeforeSave: false });
+
+  return {
+    message: 'Password reset code generated.',
+    email: user.email,
+    resetCode
+  };
+};
+
+export const resetPassword = async (email, resetCode, newPassword) => {
+  const user = await User.findOne({ email }).select('+password +resetPasswordToken +resetPasswordExpires');
+  if (!user) {
+    const error = new Error('No account found with that email address.');
+    error.statusCode = 404;
+    error.code = 'USER_NOT_FOUND';
+    throw error;
+  }
+
+  if (
+    !user.resetPasswordToken ||
+    user.resetPasswordToken !== resetCode ||
+    !user.resetPasswordExpires ||
+    user.resetPasswordExpires < new Date()
+  ) {
+    const error = new Error('Invalid or expired reset code. Please request a new one.');
+    error.statusCode = 400;
+    error.code = 'INVALID_RESET_CODE';
+    throw error;
+  }
+
+  user.password = newPassword;
+  user.resetPasswordToken = undefined;
+  user.resetPasswordExpires = undefined;
+  await user.save();
+
+  return {
+    message: 'Password has been reset successfully. You can now log in with your new password.'
+  };
+};
