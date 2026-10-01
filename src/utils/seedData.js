@@ -62,21 +62,24 @@ export const autoSeedData = async (force = false) => {
       return;
     }
 
-    // Seed Default Admin
-    let admin = await User.findOne({ email: 'admin@geocircle.com' });
+    // Seed Default Admin from Environment Variables
+    const adminEmail = config.adminEmail;
+    const adminPass = config.adminPass;
+
+    let admin = await User.findOne({ email: adminEmail });
     if (!admin) {
       admin = await User.create({
         name: 'System Administrator',
-        email: 'admin@geocircle.com',
-        password: 'admin@123',
+        email: adminEmail,
+        password: adminPass,
         role: 'ADMIN',
         isActive: true
       });
-      logger.info('✅ Default Admin user created: admin@geocircle.com / admin@123');
+      logger.info(`✅ Default Admin user created: ${adminEmail}`);
     } else {
-      admin.password = 'admin@123';
+      admin.password = adminPass;
       await admin.save();
-      logger.info('✅ Default Admin password updated: admin@geocircle.com / admin@123');
+      logger.info(`✅ Default Admin password updated from env configuration`);
     }
 
     // Seed Default Active Meeting if none exists

@@ -18,5 +18,7 @@ export const config = {
   smtpPort: parseInt(process.env.SMTP_PORT || '587', 10),
   smtpUser: process.env.SMTP_USER || '',
   smtpPass: process.env.SMTP_PASS || '',
-  smtpFrom: process.env.SMTP_FROM || 'GeoCircle <noreply@geocircle.com>'
+  smtpFrom: process.env.SMTP_FROM || 'GeoCircle <noreply@geocircle.com>',
+  adminEmail: process.env.DEFAULT_ADMIN_EMAIL || 'admin@geocircle.com',
+  adminPass: process.env.DEFAULT_ADMIN_PASSWORD || 'admin@123'
 };

@@ -28,6 +28,8 @@ router.delete('/users/:id', adminUserController.deleteUser);
 // --- ADMIN MEETING ROUTES ---
 router.post('/meetings', validate(createMeetingSchema), adminMeetingController.createMeeting);
 router.patch('/meetings/:id', validate(updateMeetingSchema), adminMeetingController.updateMeeting);
+router.patch('/meetings/:id/toggle-checkin', adminMeetingController.toggleCheckInPermission);
+router.get('/meetings/:id/present-users', adminMeetingController.getPresentUsers);
 router.delete('/meetings/:id', adminMeetingController.deleteMeeting);
 
 // --- ADMIN REPORT ROUTES ---

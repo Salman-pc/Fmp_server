@@ -1,5 +1,6 @@
 import { Meeting } from '../models/Meeting.js';
-import { MEETING_STATUS } from '../config/constants.js';
+import { CheckIn } from '../models/CheckIn.js';
+import { CHECKIN_STATUS, MEETING_STATUS } from '../config/constants.js';
 
 export const createMeeting = async (meetingData, adminId) => {
   const { latitude, longitude, ...rest } = meetingData;
@@ -111,4 +112,45 @@ export const deleteMeeting = async (meetingId) => {
     throw error;
   }
   return { message: 'Meeting deleted successfully' };
+};
+
+export const toggleCheckInPermission = async (meetingId, checkInEnabled) => {
+  const meeting = await Meeting.findById(meetingId);
+  if (!meeting) {
+    const error = new Error('Meeting not found');
+    error.statusCode = 404;
+    throw error;
+  }
+
+  meeting.checkInEnabled = typeof checkInEnabled === 'boolean' ? checkInEnabled : !meeting.checkInEnabled;
+  await meeting.save();
+  return meeting;
+};
+
+export const getPresentUsersForMeeting = async (meetingId) => {
+  const meeting = await Meeting.findById(meetingId);
+  if (!meeting) {
+    const error = new Error('Meeting not found');
+    error.statusCode = 404;
+    throw error;
+  }
+
+  const presentCheckIns = await CheckIn.find({
+    meeting: meetingId,
+    status: CHECKIN_STATUS.PRESENT
+  })
+    .populate('user', 'name email avatar phone department designation employeeId')
+    .sort({ checkedInAt: -1 })
+    .lean();
+
+  return {
+    meeting: {
+      id: meeting._id,
+      title: meeting.title,
+      locationName: meeting.locationName,
+      checkInEnabled: meeting.checkInEnabled
+    },
+    presentCount: presentCheckIns.length,
+    presentUsers: presentCheckIns
+  };
 };

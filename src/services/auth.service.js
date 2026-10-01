@@ -173,6 +173,33 @@ export const forgotPassword = async (email) => {
   };
 };
 
+export const verifyOtp = async (email, resetCode) => {
+  const user = await User.findOne({ email }).select('+resetPasswordToken +resetPasswordExpires');
+  if (!user) {
+    const error = new Error('No account found with that email address.');
+    error.statusCode = 404;
+    error.code = 'USER_NOT_FOUND';
+    throw error;
+  }
+
+  if (
+    !user.resetPasswordToken ||
+    user.resetPasswordToken !== resetCode ||
+    !user.resetPasswordExpires ||
+    user.resetPasswordExpires < new Date()
+  ) {
+    const error = new Error('Invalid or expired OTP code. Please check and try again.');
+    error.statusCode = 400;
+    error.code = 'INVALID_OTP';
+    throw error;
+  }
+
+  return {
+    valid: true,
+    message: 'OTP verified successfully.'
+  };
+};
+
 export const resetPassword = async (email, resetCode, newPassword) => {
   const user = await User.findOne({ email }).select('+password +resetPasswordToken +resetPasswordExpires');
   if (!user) {

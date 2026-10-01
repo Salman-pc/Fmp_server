@@ -37,3 +37,29 @@ export const deleteMeeting = async (req, res, next) => {
     next(error);
   }
 };
+
+export const toggleCheckInPermission = async (req, res, next) => {
+  try {
+    const { checkInEnabled } = req.body;
+    const meeting = await meetingService.toggleCheckInPermission(req.params.id, checkInEnabled);
+    res.status(200).json({
+      success: true,
+      message: `Check-in permission ${meeting.checkInEnabled ? 'enabled' : 'disabled'} for meeting.`,
+      data: { meeting }
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getPresentUsers = async (req, res, next) => {
+  try {
+    const result = await meetingService.getPresentUsersForMeeting(req.params.id);
+    res.status(200).json({
+      success: true,
+      data: result
+    });
+  } catch (error) {
+    next(error);
+  }
+};
