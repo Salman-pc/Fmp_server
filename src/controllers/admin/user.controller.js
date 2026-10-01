@@ -1,4 +1,6 @@
 import { User } from '../../models/User.js';
+import { CheckIn } from '../../models/CheckIn.js';
+import { GameSession } from '../../models/GameSession.js';
 
 export const getUsers = async (req, res, next) => {
   try {
@@ -97,7 +99,7 @@ export const updateUser = async (req, res, next) => {
 export const deleteUser = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const user = await User.findByIdAndDelete(id);
+    const user = await User.findById(id);
 
     if (!user) {
       return res.status(404).json({
@@ -106,9 +108,16 @@ export const deleteUser = async (req, res, next) => {
       });
     }
 
+    // Cascade delete all associated user records from database
+    await Promise.all([
+      CheckIn.deleteMany({ user: id }),
+      GameSession.deleteMany({ $or: [{ host: id }, { 'players.user': id }] }),
+      User.findByIdAndDelete(id)
+    ]);
+
     res.status(200).json({
       success: true,
-      message: 'User deleted successfully'
+      message: 'User and all associated data permanently deleted successfully'
     });
   } catch (error) {
     next(error);
